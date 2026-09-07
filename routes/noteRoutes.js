@@ -11,6 +11,12 @@ router.get('/', async (req, res) => {
 });
 
 
+// Create a new note and saves it to the database
+router.post('/', async (req, res) => {
+    const note = new Note(req.body);
+    await note.save();
+    res.json(note);
+});
 
 
 module.exports = router;
