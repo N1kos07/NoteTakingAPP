@@ -4,9 +4,10 @@ require('dotenv').config();
 
 
 const app = express();
+app.use(express.json());
 const port = 3000;
 
-
+// This is my mongoDB connection
 mongoose.connect(process.env.MONGO_URL)
   .then(() => {
     console.log("MongoDB connected");
@@ -15,6 +16,10 @@ mongoose.connect(process.env.MONGO_URL)
     console.log(error);
   });
 
+
+// Sends all /note requests to noteRoutes.js
+const noteRoutes = require('./routes/noteRoutes');
+app.use('/notes', noteRoutes);
 
 
 app.get('/', (req, res) => {
