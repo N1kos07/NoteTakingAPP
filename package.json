@@ -7,11 +7,15 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha tests"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "mongoose": "^9.9.5"
+  },
+  "devDependencies": {
+    "chai": "^6.2.2",
+    "mocha": "^12.0.0"
   }
 }

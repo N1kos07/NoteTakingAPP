@@ -5,7 +5,7 @@ const Note = require('../models/Note');
 const getAllNotes = async (req, res) => {
     try {
         const notes = await Note.find();
-        res.json(notes);
+        res.status(200).json(notes);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -17,7 +17,7 @@ const createNote = async (req, res) => {
     try {
         const note = new Note(req.body);
         await note.save();
-        res.json(note);
+        res.status(201).json(note);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -31,7 +31,7 @@ const updateNote = async (req, res) => {
             req.body, 
             { new: true, runValidators: true }
         );
-        res.json(updatedNote);
+        res.status(200).json(updatedNote);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -41,7 +41,7 @@ const updateNote = async (req, res) => {
 const deleteNote = async (req, res) => {
     try {
         await Note.findByIdAndDelete(req.params.id);
-        res.json({ message: 'Note deleted successfully' });
+        res.status(200).json({ message: 'Note deleted successfully' });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
