@@ -8,16 +8,47 @@
     <script src="script.js" defer></script>
 </head>
 <body>
-    
-    <h1>My Notes</h1>
 
-    <form id='noteForm'>
-        <input type="text" id="noteTitle" placeholder="Note Title">
-        <textarea id="noteContent" placeholder="Write your notes here"></textarea>
-        <button type="submit">Add Note</button>
-    </form>
+    <div class="app">
 
-    <div id="notesContainer"></div>
+        <!-- Notes sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>Notes</h1>
+                <button id="createNoteBtn">Create Note</button>
+            </div>
+
+            <div id="notesList"></div>
+        </aside>
+
+        <!-- Note editor -->
+        <main class="editor">
+            <form id="noteForm">
+
+                <input
+                    type="text"
+                    id="title"
+                    placeholder="Title"
+                    required
+                >
+
+                <textarea
+                    id="content"
+                    placeholder="Start writing..."
+                    required
+                ></textarea>
+
+                <div class="editor-buttons">
+                    <button type="submit" id="saveBtn">Save</button>
+                    <button type="button" id="deleteBtn">Delete</button>
+                </div>
+
+                <p id="message"></p>
+
+            </form>
+        </main>
+
+    </div>
 
 
 </body>

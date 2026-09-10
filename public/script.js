@@ -1,54 +1,134 @@
-// Load and display notes from the server
+// Stores all notes from the server
+let notes = [];
+
+// Stores the note currently being edited
+let selectedNoteId = null;
+
+// Get elements from the page
+const noteForm = document.getElementById("noteForm");
+const titleInput = document.getElementById("title");
+const contentInput = document.getElementById("content");
+const notesList = document.getElementById("notesList");
+const createNoteBtn = document.getElementById("createNoteBtn");
+const deleteBtn = document.getElementById("deleteBtn");
+
+
+
+// Load notes from the server
 async function loadNotes() {
     const response = await fetch("/notes");
-    const notes = await response.json();
+    notes = await response.json();
 
-    const notesContainer = document.getElementById("notesContainer");
+    displayNotes();
+}
 
-    notesContainer.innerHTML = "";
+
+// Display notes in the sidebar
+function displayNotes() {
+    notesList.innerHTML = "";
 
     notes.forEach((note) => {
         const noteDiv = document.createElement("div");
 
-        noteDiv.innerHTML = `
-            <h3>${note.title}</h3>
-            <p>${note.content}</p>
-        `;
+        noteDiv.textContent = note.title;
+        noteDiv.classList.add("note-item");
 
-        notesContainer.appendChild(noteDiv);
+        if (note._id === selectedNoteId) {
+            noteDiv.classList.add("active");
+        }
+
+        noteDiv.addEventListener("click", () => {
+            selectNote(note._id);
+        });
+
+        notesList.appendChild(noteDiv);
     });
 }
 
 
-loadNotes();
+// Open a note in the editor
+function selectNote(id) {
+    selectedNoteId = id;
+
+    const note = notes.find((note) => note._id === id);
+
+    titleInput.value = note.title;
+    contentInput.value = note.content;
+
+    displayNotes();
+}
 
 
-// Adds a new note
-const noteForm = document.getElementById("noteForm");
+// Start a new note
+createNoteBtn.addEventListener("click", () => {
+    selectedNoteId = null;
 
+    titleInput.value = "";
+    contentInput.value = "";
+
+    displayNotes();
+
+    titleInput.focus();
+});
+
+
+// Save or update a note
 noteForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const title = document.getElementById("noteTitle").value;
-    const content = document.getElementById("noteContent").value;
+    const noteData = {
+        title: titleInput.value,
+        content: contentInput.value
+    };
 
-    await fetch("/notes", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            title: title,
-            content: content
-        })
+    if (selectedNoteId === null) {
+        const response = await fetch("/notes", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(noteData)
+        });
+
+        const newNote = await response.json();
+
+        selectedNoteId = newNote._id;
+    } else {
+        await fetch(`/notes/${selectedNoteId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(noteData)
+        });
+    }
+
+    await loadNotes();
+});
+
+
+// Delete the selected note
+deleteBtn.addEventListener("click", async () => {
+    if (selectedNoteId === null) {
+        return;
+    }
+
+    await fetch(`/notes/${selectedNoteId}`, {
+        method: "DELETE"
     });
 
-    noteForm.reset();
+    selectedNoteId = null;
 
-    loadNotes();
+    titleInput.value = "";
+    contentInput.value = "";
+
+    await loadNotes();
 });
 
 
 
 
 
+
+// Load notes when the page opens
+loadNotes();
