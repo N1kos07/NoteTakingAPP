@@ -11,14 +11,23 @@ const contentInput = document.getElementById("content");
 const notesList = document.getElementById("notesList");
 const createNoteBtn = document.getElementById("createNoteBtn");
 const deleteBtn = document.getElementById("deleteBtn");
+const message = document.getElementById("message");
 
 
 
+// Loads notes from the server
 // Load notes from the server
 async function loadNotes() {
     const response = await fetch("/notes");
+
+    if (!response.ok) {
+        message.textContent = "Could not load notes.";
+        return;
+    }
+
     notes = await response.json();
 
+    message.textContent = "";
     displayNotes();
 }
 
@@ -90,37 +99,58 @@ noteForm.addEventListener("submit", async (event) => {
             body: JSON.stringify(noteData)
         });
 
-        const newNote = await response.json();
+        if (!response.ok) {
+            const errorData = await response.json();
+            message.textContent = errorData.error;
+            return;
+        }
 
+        const newNote = await response.json();
         selectedNoteId = newNote._id;
     } else {
-        await fetch(`/notes/${selectedNoteId}`, {
+        const response = await fetch(`/notes/${selectedNoteId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(noteData)
         });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            message.textContent = errorData.error;
+            return;
+        }
     }
 
-    await loadNotes();
+    message.textContent = "";
+    await loadNotes();      
 });
 
 
+// Delete the selected note
 // Delete the selected note
 deleteBtn.addEventListener("click", async () => {
     if (selectedNoteId === null) {
         return;
     }
 
-    await fetch(`/notes/${selectedNoteId}`, {
+    const response = await fetch(`/notes/${selectedNoteId}`, {
         method: "DELETE"
     });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        message.textContent = errorData.error;
+        return;
+    }
 
     selectedNoteId = null;
 
     titleInput.value = "";
     contentInput.value = "";
+
+    message.textContent = "";
 
     await loadNotes();
 });
