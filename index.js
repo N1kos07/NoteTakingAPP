@@ -14,14 +14,24 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 const port = 3000;
 
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
 }));
-//configPassport(passport);
 app.use(passport.initialize());
 app.use(passport.session());
+
+
+// Check if the user is logged in
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+
+    res.redirect("/auth/login");
+}
 
 
 // This is my mongoDB connection
@@ -36,14 +46,14 @@ mongoose.connect(process.env.MONGO_URL)
 
 
 // Sends all /note requests to noteRoutes.js
-app.use('/notes', noteRoutes);
+app.use("/notes", ensureAuthenticated, noteRoutes);
 
 // Sends all /note requests to authRoutes.js
 app.use('/auth', authRoutes);
 
 
-app.get('/', (req, res) => {
-  res.render('index');
+app.get("/", ensureAuthenticated, (req, res) => {
+  res.render("index", { user: req.user });
 });
 
 app.listen(port, () => {

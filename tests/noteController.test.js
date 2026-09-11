@@ -11,6 +11,9 @@ describe('noteController validation', () => {
             body: {
                 title: 'test note',
                 // content is missing
+            },
+            user: {
+                _id: "507f1f77bcf86cd799439011"
             }
         };
 
@@ -35,13 +38,16 @@ describe('noteController validation', () => {
     it('updateNote was not successful', async () => {
 
         const req = {
-        params: {
-            id: "not-a-valid-id"
-        },
-        body: {
-            title: "Updated title",
-            content: "Updated content"
-        }
+            params: {
+                id: "not-a-valid-id"
+            },
+            body: {
+                title: "Updated title",
+                content: "Updated content"
+            },
+            user: {
+                _id: "507f1f77bcf86cd799439011"
+            }
         };
 
         let statusCode;
@@ -66,6 +72,9 @@ describe('noteController validation', () => {
         const req = {
             params: {
                 id: "not-a-valid-id"
+            },
+            user: {
+                _id: "507f1f77bcf86cd799439011"
             }
         };
 

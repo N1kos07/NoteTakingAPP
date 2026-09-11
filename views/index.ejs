@@ -13,7 +13,9 @@
         <!-- Notes sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h1>Notes</h1>
+                <% if (user) { %>
+                    <h1><%= user.displayName %>'s Notes</h1>
+                <% } %>
                 <button id="createNoteBtn">Create Note</button>
             </div>
 
