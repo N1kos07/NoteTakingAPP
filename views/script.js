@@ -129,7 +129,6 @@ noteForm.addEventListener("submit", async (event) => {
 
 
 // Delete the selected note
-// Delete the selected note
 deleteBtn.addEventListener("click", async () => {
     if (selectedNoteId === null) {
         return;

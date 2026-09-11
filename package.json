@@ -12,7 +12,10 @@
   "dependencies": {
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mongoose": "^9.9.5"
+    "express-session": "^1.19.0",
+    "mongoose": "^9.9.5",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0"
   },
   "devDependencies": {
     "chai": "^6.2.2",
