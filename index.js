@@ -11,6 +11,7 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 app.use(express.static('public'));
+app.set('view engine', 'ejs');
 const port = 3000;
 
 app.use(session({
@@ -22,6 +23,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+
 // This is my mongoDB connection
 mongoose.connect(process.env.MONGO_URL)
   .then(() => {
@@ -32,17 +34,16 @@ mongoose.connect(process.env.MONGO_URL)
   });
 
 
-// Sends all /note requests to noteRoutes.js
 
+// Sends all /note requests to noteRoutes.js
 app.use('/notes', noteRoutes);
 
 // Sends all /note requests to authRoutes.js
-
 app.use('/auth', authRoutes);
 
 
 app.get('/', (req, res) => {
-  res.send('Note-taking app is running!');
+  res.render('index');
 });
 
 app.listen(port, () => {

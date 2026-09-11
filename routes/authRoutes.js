@@ -5,7 +5,7 @@ const router = express.Router();
 
 
 // login
-//call back
+// call back
 // logout
 
 
@@ -13,7 +13,7 @@ router.get('/login', passport.authenticate('google', { scope: ['profile', 'email
 
 
 router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
-    res.redirect('/notes'); // Redirect to the home page or any other page after successful login
+    res.redirect('/'); // Redirect to the home page or any other page after successful login
 });
 
 
