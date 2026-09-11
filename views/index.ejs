@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Note Taking App</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Notes</title>
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
@@ -13,46 +13,99 @@
         <!-- Notes sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <% if (user) { %>
-                    <h1><%= user.displayName %>'s Notes</h1>
-                <% } %>
-                <button id="createNoteBtn">Create Note</button>
+                <h1>Notes</h1>
             </div>
 
-            <div id="notesList"></div>
+            <button type="button" id="createNoteBtn">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                Create note
+            </button>
+
+            <label class="search-box" for="searchInput">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7"></circle>
+                    <path d="m20 20-4-4"></path>
+                </svg>
+                <input type="search" id="searchInput" placeholder="Search notes">
+            </label>
+
+            <div class="notes-heading">
+                <span class="notes-heading-label">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 3h9l4 4v14H6z"></path>
+                        <path d="M15 3v5h5M9 13h7M9 17h7"></path>
+                    </svg>
+                    All notes
+                </span>
+                <span id="noteCount">0</span>
+            </div>
+
+            <nav id="notesList" aria-label="Notes list"></nav>
 
             <% if (user) { %>
-                <form action="/auth/logout" method="POST">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            <% } %>
+                <% const initials = user.displayName
+                    .split(" ")
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map((name) => name.charAt(0).toUpperCase())
+                    .join(""); %>
 
+                <div class="user-area">
+                    <div class="user-avatar"><%= initials || "U" %></div>
+                    <div class="user-details">
+                        <p class="user-name"><%= user.displayName %></p>
+                        <p class="user-email"><%= user.email %></p>
+                    </div>
+
+                    <form action="/auth/logout" method="POST" class="logout-form">
+                        <button type="submit" class="logout-btn" aria-label="Log out" title="Log out">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M10 5H5v14h5M14 8l4 4-4 4M8 12h10"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            <% } %>
         </aside>
 
         <!-- Note editor -->
         <main class="editor">
             <form id="noteForm">
+                <header class="editor-header">
+                    <p id="noteTimestamp">Create a note or select one from the list</p>
 
-                <input
-                    type="text"
-                    id="title"
-                    placeholder="Title"
-                    required
-                >
+                    <div class="editor-buttons">
+                        <button type="button" id="deleteBtn" aria-label="Delete note" title="Delete note" disabled>
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"></path>
+                            </svg>
+                        </button>
+                        <button type="submit" id="saveBtn">Save note</button>
+                    </div>
+                </header>
 
-                <textarea
-                    id="content"
-                    placeholder="Start writing..."
-                    required
-                ></textarea>
+                <section class="editor-content">
+                    <input
+                        type="text"
+                        id="title"
+                        aria-label="Note title"
+                        placeholder="Note title"
+                        required
+                    >
 
-                <div class="editor-buttons">
-                    <button type="submit" id="saveBtn">Save</button>
-                    <button type="button" id="deleteBtn">Delete</button>
-                </div>
+                    <div class="title-accent"></div>
 
-                <p id="message"></p>
+                    <textarea
+                        id="content"
+                        aria-label="Note content"
+                        placeholder="Start writing..."
+                        required
+                    ></textarea>
 
+                    <p id="message" role="status"></p>
+                </section>
             </form>
         </main>
 
@@ -73,10 +126,85 @@
         const createNoteBtn = document.getElementById("createNoteBtn");
         const deleteBtn = document.getElementById("deleteBtn");
         const message = document.getElementById("message");
+        const searchInput = document.getElementById("searchInput");
+        const noteCount = document.getElementById("noteCount");
+        const noteTimestamp = document.getElementById("noteTimestamp");
 
 
+        // Get a note's date without changing the database schema
+        function getNoteDate(note) {
+            if (note.updatedAt || note.createdAt) {
+                return new Date(note.updatedAt || note.createdAt);
+            }
 
-        // Loads notes from the server
+            // MongoDB ObjectIds contain the time when the document was created
+            if (note._id && /^[0-9a-f]{24}$/i.test(note._id)) {
+                const timestamp = parseInt(note._id.substring(0, 8), 16) * 1000;
+                return new Date(timestamp);
+            }
+
+            return null;
+        }
+
+
+        // Format a short date for the notes list
+        function formatNoteDate(note) {
+            const date = getNoteDate(note);
+
+            if (!date) {
+                return "";
+            }
+
+            const today = new Date();
+            const yesterday = new Date();
+            yesterday.setDate(today.getDate() - 1);
+
+            if (date.toDateString() === today.toDateString()) {
+                return "Today";
+            }
+
+            if (date.toDateString() === yesterday.toDateString()) {
+                return "Yesterday";
+            }
+
+            return date.toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric"
+            });
+        }
+
+
+        // Show the selected note's date above the editor
+        function updateEditorDetails(note) {
+            deleteBtn.disabled = !note;
+
+            if (!note) {
+                noteTimestamp.textContent = "Create a note or select one from the list";
+                return;
+            }
+
+            const date = getNoteDate(note);
+
+            if (!date) {
+                noteTimestamp.textContent = "Note selected";
+                return;
+            }
+
+            const label = note.updatedAt ? "Last edited" : "Created";
+            const formattedDate = date.toLocaleDateString(undefined, {
+                month: "long",
+                day: "numeric",
+                year: "numeric"
+            });
+            const formattedTime = date.toLocaleTimeString(undefined, {
+                hour: "numeric",
+                minute: "2-digit"
+            });
+
+            noteTimestamp.textContent = `${label} ${formattedDate} at ${formattedTime}`;
+        }
+
+
         // Load notes from the server
         async function loadNotes() {
             const response = await fetch("/notes");
@@ -90,6 +218,9 @@
 
             message.textContent = "";
             displayNotes();
+
+            const selectedNote = notes.find((note) => note._id === selectedNoteId);
+            updateEditorDetails(selectedNote);
         }
 
 
@@ -97,21 +228,61 @@
         function displayNotes() {
             notesList.innerHTML = "";
 
-            notes.forEach((note) => {
-                const noteDiv = document.createElement("div");
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            const filteredNotes = notes.filter((note) => {
+                const title = note.title.toLowerCase();
+                const content = note.content.toLowerCase();
+                return title.includes(searchTerm) || content.includes(searchTerm);
+            });
 
-                noteDiv.textContent = note.title;
-                noteDiv.classList.add("note-item");
+            noteCount.textContent = searchTerm
+                ? `${filteredNotes.length} of ${notes.length}`
+                : notes.length;
+
+            if (filteredNotes.length === 0) {
+                const emptyMessage = document.createElement("p");
+                emptyMessage.classList.add("empty-notes");
+                emptyMessage.textContent = searchTerm
+                    ? "No matching notes"
+                    : "No notes yet";
+                notesList.appendChild(emptyMessage);
+                return;
+            }
+
+            filteredNotes.forEach((note) => {
+                const noteButton = document.createElement("button");
+                noteButton.type = "button";
+                noteButton.classList.add("note-item");
 
                 if (note._id === selectedNoteId) {
-                    noteDiv.classList.add("active");
+                    noteButton.classList.add("active");
                 }
 
-                noteDiv.addEventListener("click", () => {
+                const noteTopLine = document.createElement("span");
+                noteTopLine.classList.add("note-top-line");
+
+                const noteTitle = document.createElement("span");
+                noteTitle.classList.add("note-item-title");
+                noteTitle.textContent = note.title;
+
+                const noteDate = document.createElement("span");
+                noteDate.classList.add("note-date");
+                noteDate.textContent = formatNoteDate(note);
+
+                const notePreview = document.createElement("span");
+                notePreview.classList.add("note-preview");
+                notePreview.textContent = note.content.replace(/\s+/g, " ").trim() || "Start writing...";
+
+                noteTopLine.appendChild(noteTitle);
+                noteTopLine.appendChild(noteDate);
+                noteButton.appendChild(noteTopLine);
+                noteButton.appendChild(notePreview);
+
+                noteButton.addEventListener("click", () => {
                     selectNote(note._id);
                 });
 
-                notesList.appendChild(noteDiv);
+                notesList.appendChild(noteButton);
             });
         }
 
@@ -122,9 +293,15 @@
 
             const note = notes.find((note) => note._id === id);
 
+            if (!note) {
+                return;
+            }
+
             titleInput.value = note.title;
             contentInput.value = note.content;
 
+            message.textContent = "";
+            updateEditorDetails(note);
             displayNotes();
         }
 
@@ -135,11 +312,17 @@
 
             titleInput.value = "";
             contentInput.value = "";
+            message.textContent = "";
 
+            updateEditorDetails(null);
             displayNotes();
 
             titleInput.focus();
         });
+
+
+        // Filter notes as the user types in the search box
+        searchInput.addEventListener("input", displayNotes);
 
 
         // Save or update a note
@@ -185,7 +368,7 @@
             }
 
             message.textContent = "";
-            await loadNotes();      
+            await loadNotes();
         });
 
 
@@ -209,15 +392,11 @@
 
             titleInput.value = "";
             contentInput.value = "";
-
             message.textContent = "";
 
+            updateEditorDetails(null);
             await loadNotes();
         });
-
-
-
-
 
 
         // Load notes when the page opens

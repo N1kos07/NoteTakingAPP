@@ -1,17 +1,19 @@
-/* Page setup */
+/* Basic page setup */
 * {
     box-sizing: border-box;
 }
 
 html,
 body {
-    height: 100%;
+    min-height: 100%;
     margin: 0;
 }
 
 body {
-    background-color: #f5f3ee;
-    color: #2c2c2e;
+    min-width: 760px;
+    padding: 32px;
+    color: #302e2a;
+    background-color: #f8f7f3;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
 }
@@ -26,228 +28,522 @@ button {
     cursor: pointer;
 }
 
-/* Main app layout */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid rgba(197, 155, 57, 0.24);
+    outline-offset: 2px;
+}
+
+svg {
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+::selection {
+    background-color: #f1df9f;
+}
+
+/* Main app window */
 .app {
     display: flex;
     width: 100%;
-    min-width: 760px;
-    height: 100vh;
+    max-width: 1440px;
+    height: calc(100vh - 64px);
+    min-height: 640px;
+    margin: 0 auto;
     overflow: hidden;
     background-color: #ffffff;
+    border: 1px solid #e2ded5;
+    border-radius: 22px;
+    box-shadow: 0 20px 60px -36px rgba(36, 31, 22, 0.3);
 }
 
-/* Notes sidebar */
+/* Sidebar */
 .sidebar {
     display: flex;
-    flex: 0 0 320px;
+    flex: 0 0 300px;
     flex-direction: column;
     min-width: 0;
-    background-color: #f7f5f0;
-    border-right: 1px solid #ddd9d0;
-    justify-content: space-between;
+    padding: 24px 20px 18px;
+    background-color: #f5f3ee;
+    border-right: 1px solid #e2ded5;
 }
 
 .sidebar-header {
-    padding: 30px 24px 20px;
-    border-bottom: 1px solid #e4e0d7;
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 8px;
 }
 
 .sidebar-header h1 {
-    margin: 0 0 18px;
-    color: #1d1d1f;
-    font-size: 30px;
-    font-weight: 700;
-    letter-spacing: -0.7px;
+    margin: 0;
+    color: #292722;
+    font-size: 21px;
+    font-weight: 650;
+    letter-spacing: -0.6px;
 }
-
-.logout-btn {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 8px;
-    background-color: #e5e5e5;
-    color: black;
-    cursor: pointer;
-}
-
-.logout-btn:hover {
-    background-color: #d8d8d8;
-}
-
 
 /* Create note button */
 #createNoteBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     width: 100%;
-    padding: 11px 16px;
-    color: #3d3214;
-    background-color: #f2c94c;
-    border: 1px solid #dfb83f;
-    border-radius: 9px;
-    font-size: 15px;
+    height: 44px;
+    margin-top: 24px;
+    padding: 0 16px;
+    color: #3d321a;
+    background-color: #ead078;
+    border: 1px solid #dfc362;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(86, 66, 18, 0.08);
+    font-size: 14px;
     font-weight: 600;
 }
 
 #createNoteBtn:hover {
-    background-color: #edc13e;
+    background-color: #e4c766;
 }
 
-#createNoteBtn:focus-visible {
-    outline: 3px solid rgba(223, 177, 34, 0.35);
-    outline-offset: 2px;
+#createNoteBtn svg {
+    width: 17px;
+    height: 17px;
+    stroke-width: 2.2;
+}
+
+/* Search box */
+.search-box {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    margin-top: 18px;
+    padding: 0 11px;
+    color: #88847c;
+    background-color: #fdfcf9;
+    border: 1px solid #dedad1;
+    border-radius: 12px;
+}
+
+.search-box:focus-within {
+    border-color: #c8aa53;
+    box-shadow: 0 0 0 3px rgba(197, 155, 57, 0.12);
+}
+
+.search-box svg {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+}
+
+#searchInput {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    padding: 0 0 0 9px;
+    color: #383630;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    font-size: 14px;
+}
+
+#searchInput::placeholder {
+    color: #969188;
+}
+
+/* Notes heading and count */
+.notes-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 22px;
+    padding: 0 8px;
+    color: #817d74;
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+.notes-heading-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.notes-heading svg {
+    width: 14px;
+    height: 14px;
+}
+
+#noteCount {
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 /* Notes list */
 #notesList {
     flex: 1;
-    padding: 12px;
+    min-height: 0;
+    margin-top: 8px;
+    padding-right: 4px;
     overflow-y: auto;
 }
 
 .note-item {
-    margin-bottom: 5px;
-    padding: 14px 16px;
+    display: block;
+    width: 100%;
+    margin: 0 0 4px;
+    padding: 12px;
     overflow: hidden;
-    color: #3a3a3c;
+    color: #37342e;
+    background: transparent;
     border: 1px solid transparent;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 500;
-    line-height: 1.35;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    cursor: pointer;
+    border-radius: 12px;
+    text-align: left;
 }
 
 .note-item:hover {
-    background-color: #ece9e2;
+    background-color: #ebe8e1;
 }
 
-/* Selected note */
 .note-item.active {
-    color: #332b17;
-    background-color: #fff0b8;
-    border-color: #efd77d;
+    color: #3d321a;
+    background-color: #efe1ae;
+    border-color: #e6d28e;
+}
+
+.note-top-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.note-item-title {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.note-date {
+    flex: 0 0 auto;
+    color: #8b867d;
+    font-size: 11px;
+    font-weight: 400;
+}
+
+.note-preview {
+    display: block;
+    margin-top: 4px;
+    overflow: hidden;
+    color: #817d74;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.55;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.note-item.active .note-date,
+.note-item.active .note-preview {
+    color: #75683f;
+}
+
+.empty-notes {
+    margin: 28px 8px;
+    color: #918c83;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* User information */
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 16px 8px 0;
+    border-top: 1px solid #dedad1;
+}
+
+.user-avatar {
+    display: flex;
+    flex: 0 0 36px;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    color: #645526;
+    background-color: #eadca8;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.user-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-name,
+.user-email {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-name {
+    color: #35322d;
+    font-size: 13px;
     font-weight: 600;
 }
 
-/* Note editor */
+.user-email {
+    margin-top: 2px;
+    color: #88837a;
+    font-size: 11px;
+}
+
+.logout-form {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    color: #817d74;
+    background: transparent;
+    border: 0;
+    border-radius: 9px;
+}
+
+.logout-btn:hover {
+    color: #35322d;
+    background-color: #e8e5de;
+}
+
+.logout-btn svg {
+    width: 17px;
+    height: 17px;
+}
+
+/* Editor */
 .editor {
     flex: 1;
     min-width: 0;
-    padding: 48px 56px 32px;
-    overflow-y: auto;
-    background-color: #fffefa;
+    background-color: #fcfbf8;
 }
 
 #noteForm {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 940px;
     height: 100%;
-    min-height: 520px;
-    margin: 0 auto;
+}
+
+.editor-header {
+    display: flex;
+    flex: 0 0 74px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 0 42px;
+    border-bottom: 1px solid #e2ded5;
+}
+
+#noteTimestamp {
+    margin: 0;
+    overflow: hidden;
+    color: #8a857c;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#noteTimestamp::before {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 8px;
+    background-color: #d8c98d;
+    border-radius: 50%;
+    content: "";
+}
+
+.editor-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#deleteBtn,
+#saveBtn {
+    height: 38px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+#deleteBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    padding: 0;
+    color: #827d74;
+    background: transparent;
+    border: 0;
+}
+
+#deleteBtn:hover:not(:disabled) {
+    color: #b0443c;
+    background-color: #f5e6e3;
+}
+
+#deleteBtn:disabled {
+    cursor: default;
+    opacity: 0.35;
+}
+
+#deleteBtn svg {
+    width: 18px;
+    height: 18px;
+}
+
+#saveBtn {
+    padding: 0 17px;
+    color: #fdfcf9;
+    background-color: #34312c;
+    border: 1px solid #34312c;
+}
+
+#saveBtn:hover {
+    background-color: #201e1a;
+}
+
+/* Writing area */
+.editor-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    min-height: 0;
+    padding: 58px 72px 30px;
+    overflow-y: auto;
+}
+
+#title,
+.title-accent,
+#content,
+#message {
+    width: 100%;
+    max-width: 760px;
 }
 
 #title {
-    width: 100%;
     margin: 0;
-    padding: 0 0 18px;
-    color: #1d1d1f;
-    background-color: transparent;
+    padding: 0;
+    color: #292722;
+    background: transparent;
     border: 0;
-    border-bottom: 1px solid #e4e0d8;
-    border-radius: 0;
-    outline: none;
-    font-size: 34px;
-    font-weight: 700;
-    letter-spacing: -0.8px;
+    outline: 0;
+    font-size: clamp(36px, 4vw, 56px);
+    font-weight: 650;
+    letter-spacing: -2.6px;
+    line-height: 1.08;
 }
 
 #title::placeholder {
-    color: #aaa69e;
+    color: #c6c1b8;
 }
 
-#title:focus {
-    border-bottom-color: #d4ae36;
+.title-accent {
+    flex: 0 0 1px;
+    width: 48px;
+    margin: 22px auto 0;
+    background-color: #cdbb79;
 }
 
 #content {
     flex: 1;
-    width: 100%;
-    min-height: 320px;
-    padding: 24px 0;
-    color: #353537;
-    background-color: transparent;
+    min-height: 340px;
+    margin-top: 32px;
+    padding: 0;
+    color: #4c4943;
+    background: transparent;
     border: 0;
-    outline: none;
+    outline: 0;
     resize: none;
     font-size: 17px;
-    line-height: 1.7;
+    line-height: 1.9;
 }
 
 #content::placeholder {
-    color: #aaa69e;
+    color: #bbb6ad;
 }
 
-/* Editor actions */
-.editor-buttons {
-    display: flex;
-    gap: 10px;
-    padding-top: 18px;
-    border-top: 1px solid #e4e0d8;
-}
-
-.editor-buttons button {
-    min-width: 92px;
-    padding: 10px 18px;
-    border-radius: 9px;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-#saveBtn {
-    color: #3d3214;
-    background-color: #f2c94c;
-    border: 1px solid #dfb83f;
-}
-
-#saveBtn:hover {
-    background-color: #edc13e;
-}
-
-#deleteBtn {
-    color: #b42318;
-    background-color: #ffffff;
-    border: 1px solid #d8d4cc;
-}
-
-#deleteBtn:hover {
-    background-color: #f8eeee;
-    border-color: #e3b7b3;
-}
-
-.editor-buttons button:focus-visible {
-    outline: 3px solid rgba(223, 177, 34, 0.3);
-    outline-offset: 2px;
-}
-
-/* Area reserved for save or error messages */
 #message {
     min-height: 20px;
-    margin: 12px 0 0;
-    color: #6e6e73;
-    font-size: 14px;
+    margin: 10px 0 0;
+    color: #ad3e36;
+    font-size: 13px;
 }
 
-/* Keep the layout comfortable on smaller laptop screens */
-@media (max-width: 900px) {
-    .sidebar {
-        flex-basis: 270px;
+/* Scrollbars */
+#notesList::-webkit-scrollbar,
+.editor-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+#notesList::-webkit-scrollbar-thumb,
+.editor-content::-webkit-scrollbar-thumb {
+    background-color: #d7d2c9;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background-clip: padding-box;
+}
+
+/* Smaller desktop and laptop screens */
+@media (max-width: 960px) {
+    body {
+        padding: 18px;
     }
 
-    .editor {
-        padding-right: 36px;
-        padding-left: 36px;
+    .app {
+        height: calc(100vh - 36px);
+    }
+
+    .sidebar {
+        flex-basis: 280px;
+    }
+
+    .editor-header {
+        padding: 0 28px;
+    }
+
+    .editor-content {
+        padding-right: 42px;
+        padding-left: 42px;
     }
 }
