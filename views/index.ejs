@@ -20,6 +20,13 @@
             </div>
 
             <div id="notesList"></div>
+
+            <% if (user) { %>
+                <form action="/auth/logout" method="POST">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            <% } %>
+
         </aside>
 
         <!-- Note editor -->

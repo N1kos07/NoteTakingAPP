@@ -44,6 +44,7 @@ button {
     min-width: 0;
     background-color: #f7f5f0;
     border-right: 1px solid #ddd9d0;
+    justify-content: space-between;
 }
 
 .sidebar-header {
@@ -58,6 +59,21 @@ button {
     font-weight: 700;
     letter-spacing: -0.7px;
 }
+
+.logout-btn {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background-color: #e5e5e5;
+    color: black;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background-color: #d8d8d8;
+}
+
 
 /* Create note button */
 #createNoteBtn {

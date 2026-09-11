@@ -19,12 +19,12 @@ router.get('/google/callback', passport.authenticate('google', { failureRedirect
 
 
 router.post('/logout', (req, res, next) => {
-    req.logout((err) => {
-        if (err) {
-            return next(err);
+    req.logout((error) => {
+        if (error) {
+            return next(error);
         }
 
-        res.redirect('/');
+        res.redirect('/auth/login'); 
     });
 });
 
